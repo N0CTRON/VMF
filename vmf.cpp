@@ -12,10 +12,13 @@ namespace VMF
 
     // Leaky ReLU
     template <typename vmfDevType>
-    inline void leakyReLU(vmfDevType* x, vmfDevType* y) { *x *= (*x <= vmfDevType(0)) * (*x * *y) + (*x > vmfDevType(0)); }
+    inline void leakyReLU(vmfDevType* x, vmfDevType* y) { *x = *x < vmfDevType(0) ? *x : *x * *y; }
 
     template <typename vmfDevType>
-    inline vmfDevType leakyReLU(vmfDevType x, vmfDevType y) { return x * ((x <= vmfDevType(0)) * (x * y) + (x > vmfDevType(0))); }
+    inline void leakyReLU(vmfDevType* x, vmfDevType y) { *x = *x > vmfDevType(0) ? *x : *x * y; }
+
+    template <typename vmfDevType>
+    inline vmfDevType leakyReLU(vmfDevType x, vmfDevType y) { return x < vmfDevType(0) ? x : x * y; }
 
     // Sigmoid
     template <typename vmfDevType>
