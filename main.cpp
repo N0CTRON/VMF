@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 #include "vmf.cpp"
 #include "vmf.cu"
@@ -15,22 +16,19 @@ int main()
 {
     std::srand(std::time(NULL));
 
-    float x0 = std::rand() % 10;
-    float x1 = x0;
-    float x2 = x0;
-    float x3 = x0;
-    float x4 = x0;
+    float seed((std::rand() % 2 == 1) ? (std::rand() % 5) : (-(std::rand() % 5)));
+    AOS<float> x(5, seed);
 
-    VMF::heaviside(&x1);
-    VMF::leakyReLU(&x2, &x0); // Assuming you want to apply leaky ReLU to x2 with a slope of x0
-    VMF::ReLU(&x3);
-    VMF::sigmoid(&x4);
+    VMF::heaviside(&x[1]);
+    VMF::leakyReLU(&x[2], (float)0.01); // Assuming you want to apply leaky ReLU to x2 with a slope of 0.01
+    VMF::ReLU(&x[3]);
+    VMF::sigmoid(&x[4]);
 
-    std::cout << "x: " << x0
-        << "\nHeaviside step: " << x1
-        << "\nLeaky ReLU: " << x2
-        << "\nReLU: " << x3
-        << "\nSigmoid: " << x4 << '\n';
+    std::cout << "x: " << x[0]
+        << "\nHeaviside step: " << x[1]
+        << "\nLeaky ReLU: " << x[2]
+        << "\nReLU: " << x[3]
+        << "\nSigmoid: " << x[4] << '\n';
 
     return 0;
 }
