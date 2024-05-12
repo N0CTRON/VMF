@@ -13,20 +13,17 @@ The VMF library offers the following features:
 Here is an example of how to use the VMF library:
 ```cpp
 #include <iostream>
-#include <vector>
 
 #include "vmf.cpp"
 #include "aos.hpp"
 
 int main() {
     // Create a vector of floats
-    std::vector<float> x(5);
+    AOS<float> x(5);
 
     // Initialize the vector with random values
     std::srand(std::time(NULL));
-    for (int i = 0; i < 5; i++) {
-        x[i] = (std::rand() % 2 == 1) ? (std::rand() % 5) : (-(std::rand() % 5));
-    }
+    for (int i = 0; i < 5; ++i) x[i] = (std::rand() % 2 == 1) ? (std::rand() % 5) : (-(std::rand() % 5));
 
     // Apply various activation functions
     VMF::heaviside(&x[1]);
