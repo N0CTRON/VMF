@@ -14,6 +14,7 @@
 
 int main()
 {
+    // CPU / HOST code
     std::srand(std::time(NULL));
 
     float seed((std::rand() % 2 == 1) ? (std::rand() % 5) : (-(std::rand() % 5)));
@@ -30,5 +31,20 @@ int main()
         << "\nReLU: " << x[3]
         << "\nSigmoid: " << x[4] << '\n';
 
+    //CUDA
+    constexpr size_t GPU_SCALE = 1024;
+
+    AOS<float> HOST_ARRAY(GPU_SCALE, seed);
+    cuMM<float> CUDA_Manager(GPU_SCALE);
+
+    CUDA_Manager.malloc(GPU_SCALE);
+    CUDA_Manager.copy(HOST_ARRAY.data, HOST_ARRAY.size() * sizeof(float), true); // true = send data to GPU
+    VMF_CUDA::sigmoid<<<GPU_SCALE / 1024, GPU_SCALE>>>(CUDA_Manager.data, GPU_SCALE);
+    CUDA_Manager.copy(HOST_ARRAY.data, HOST_ARRAY.size() * sizeof(float), false); // false = send from GPU to host
+
+    std::cout << "Sigmoid CUDA: " << HOST_ARRAY[0] << '\n';
+
+    x.suicide();
+    CUDA_Manager.free();
     return 0;
 }
