@@ -34,5 +34,19 @@ namespace VMF
     template <typename vmfDevType>
     inline vmfDevType heaviside(vmfDevType x) { return (x >= vmfDevType(0)) * vmfDevType(1); }
 
+    // Factorial
+    template <typename vmfDevType>
+    inline void factorial(vmfDevType* x)
+    {
+        *x = factorial(*x);
+    }
+
+    template <typename vmfDevType>
+    inline vmfDevType factorial(vmfDevType x)
+    {
+        if (x == 0) return 1;
+        return x * factorial(x - 1);
+    }
+
     // Tanh is defined in cmath.
 }
