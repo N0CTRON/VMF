@@ -54,7 +54,7 @@ namespace VMF_CUDA
         cuSize threadIndexX = blockIdx.x * blockDim.x + threadIdx.x;
         if (threadIndexX < arraySize)
         {
-            const double sigmoidValue = 1 / (1 + exp(-x[threadIndexX]));
+            const vmfDevType sigmoidValue = 1 / (1 + exp(-x[threadIndexX]));
             x[threadIndexX] = sigmoidValue * (1 - sigmoidValue);
         }
         __syncthreads();
