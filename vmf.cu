@@ -70,4 +70,20 @@ namespace VMF_CUDA
     }
 
     // Tanh is defined in cuda/std/cmath.
+
+    // Convolute1D
+    template <typename vmfDevType>
+    __global__ void convolute1DKernel(const vmfDevType* input, const vmfDevType* kernel, vmfDevType* output, cuSize inputSize, cuSize kernelSize)
+    {
+        cuSize i = blockIdx.x * blockDim.x + threadIdx.x;
+        cuSize outputSize = inputSize - kernelSize + 1;
+
+        if (i < outputSize)
+        {
+            vmfDevType sum = 0;
+            for (cuSize j = 0; j < kernelSize; ++j) sum += input[i + j] * kernel[j];
+            output[i] = sum;
+        }
+        __syncthreads();
+    }
 }
