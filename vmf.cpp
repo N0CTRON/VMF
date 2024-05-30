@@ -74,4 +74,30 @@ namespace VMF
     }
 
     // Tanh is defined in cmath.
+
+    // Convolute 1D
+    template <typename vmfDevType>
+    inline void convolute1D(const vmfDevType* input, const vmfDevType* kernel, vmfDevType* output, std::uint64_t inputSize, std::uint64_t kernelSize)
+    {
+        std::uint64_t outputSize = inputSize - kernelSize + 1;
+        for (std::uint64_t i = 0; i < outputSize; ++i)
+        {
+            output[i] = vmfDevType(0);
+            for (std::uint64_t j = 0; j < kernelSize; ++j) output[i] += input[i + j] * kernel[j];
+        }
+    }
+
+    template <typename vmfDevType>
+    inline vmfDevType* convolute1D(const vmfDevType* input, const vmfDevType* kernel, std::uint64_t inputSize, std::uint64_t kernelSize)
+    {
+        constexpr std::uint64_t vmfSize = (std::uint64_t)sizeof(vmfDevType);
+        std::uint64_t outputSize = inputSize - kernelSize + 1;
+        vmfDevType* output = (vmfDevType*)malloc(vmfSize * outputSize);
+        for (std::uint64_t i = 0; i < outputSize; ++i)
+        {
+            output[i] = vmfDevType(0);
+            for (std::uint64_t j = 0; j < kernelSize; ++j) output[i] += input[i + j] * kernel[j];
+        }
+        return output;
+    }
 }
