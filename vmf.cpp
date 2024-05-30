@@ -1,4 +1,6 @@
 #include <cmath>
+#include <malloc.h>
+#include <algorithm>
 
 namespace VMF
 {
