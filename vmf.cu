@@ -77,11 +77,11 @@ namespace VMF_CUDA
     {
         cuSize threadIndexX = blockIdx.x * blockDim.x + threadIdx.x;
         cuSize outputSize = inputSize - kernelSize + 1;
-        if (i < outputSize)
+        if (threadIndexX < outputSize)
         {
             vmfDevType sum = 0;
-            for (cuSize j = 0; j < kernelSize; ++j) sum += input[i + j] * kernel[j];
-            output[i] = sum;
+            for (cuSize j = 0; j < kernelSize; ++j) sum += input[threadIndexX + j] * kernel[j];
+            output[threadIndexX] = sum;
         }
         __syncthreads();
     }
