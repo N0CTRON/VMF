@@ -73,7 +73,7 @@ namespace VMF_CUDA
 
     // Convolute1D
     template <typename vmfDevType>
-    __global__ void convolute1DKernel(const vmfDevType* input, const vmfDevType* kernel, vmfDevType* output, cuSize inputSize, cuSize kernelSize)
+    __global__ void convolute1D(const vmfDevType* input, const vmfDevType* kernel, vmfDevType* output, cuSize inputSize, cuSize kernelSize)
     {
         cuSize i = blockIdx.x * blockDim.x + threadIdx.x;
         cuSize outputSize = inputSize - kernelSize + 1;
