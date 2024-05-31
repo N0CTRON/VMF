@@ -24,18 +24,18 @@ namespace VMF_CUDA
 
     // Leaky ReLU
     template <typename vmfDevType>
-    __global__ void leakyReLU(vmfDevType* x, vmfDevType y, cuSize arraySize)
+    __global__ void leakyReLU(vmfDevType* x, cuSize arraySize)
     {
         cuSize threadIndexX = blockIdx.x * blockDim.x + threadIdx.x;
-        if (threadIndexX < arraySize) x[threadIndexX] = x[threadIndexX] < vmfDevType(0) ? x[threadIndexX] : x[threadIndexX] * y;
+        if (threadIndexX < arraySize) x[threadIndexX] = x[threadIndexX] < vmfDevType(0) ? x[threadIndexX] : x[threadIndexX] * vmfDevType(0.01);
         __syncthreads();
     }
 
     template <typename vmfDevType>
-    __global__ void leakyReLUDerivative(vmfDevType* x, vmfDevType y, cuSize arraySize)
+    __global__ void leakyReLUDerivative(vmfDevType* x, cuSize arraySize)
     {
         cuSize threadIndexX = blockIdx.x * blockDim.x + threadIdx.x;
-        if (threadIndexX < arraySize) x[threadIndexX] = x[threadIndexX] < vmfDevType(0) ? x[threadIndexX] / y : x[threadIndexX];
+        if (threadIndexX < arraySize) x[threadIndexX] = x[threadIndexX] < vmfDevType(0) ? x[threadIndexX] * 100 : x[threadIndexX];
         __syncthreads();
     }
 
@@ -71,7 +71,6 @@ namespace VMF_CUDA
 
     // Tanh is defined in cuda/std/cmath.
 
-    // Convolute1D
     template <typename vmfDevType>
     __global__ void convolute1D(vmfDevType* input, vmfDevType* kernel, vmfDevType* output, cuSize inputSize, cuSize kernelSize)
     {
@@ -79,10 +78,19 @@ namespace VMF_CUDA
         cuSize outputSize = inputSize - kernelSize + 1;
         if (threadIndexX < outputSize)
         {
-            vmfDevType sum = 0;
+            vmfDevType sum(0);
             for (cuSize j = 0; j < kernelSize; ++j) sum += input[threadIndexX + j] * kernel[j];
             output[threadIndexX] = sum;
         }
         __syncthreads();
+    }
+
+    template <typename vmfDevType>
+    __global__ void dotProduct(vmfDevType* vars, vmfDevType var, vmfDevType* result, cuSize arraySize)
+    {
+        cuSize threadIndexX = blockIdx.x * blockDim.x + threadIdx.x;
+        vmfDevType sum = 0;
+        for (cuSize i = threadIndexX; i < arraySize; i += blockDim.x * gridDim.x) sum += vars[i] * var;
+        atomicAdd(result, sum);
     }
 }
