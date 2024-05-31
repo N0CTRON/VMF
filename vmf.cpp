@@ -1,6 +1,6 @@
 #include <cmath>
-#include <malloc.h>
-#include <algorithm>
+
+#include "aos.hpp"
 
 namespace VMF
 {
@@ -12,29 +12,23 @@ namespace VMF
     inline vmfDevType ReLU(vmfDevType x) { return std::max(x, vmfDevType(0)); }
 
     template <typename vmfDevType>
-    inline void ReLUDerivative(vmfDevType* x, vmfDevType y) { *x = *x > vmfDevType(0) ? y : vmfDevType(0.0); }
+    inline void ReLUDerivative(vmfDevType* ) { *x = *x > vmfDevType(0) ? x : vmfDevType(0.0); }
 
     template <typename vmfDevType>
-    inline vmfDevType ReLUDerivative(vmfDevType x, vmfDevType y) { return x > vmfDevType(0) ? y : vmfDevType(0.0); }
+    inline vmfDevType ReLUDerivative(vmfDevType x) { return x > vmfDevType(0) ? x : vmfDevType(0.0); }
 
     // Leaky ReLU
     template <typename vmfDevType>
-    inline void leakyReLU(vmfDevType* x, vmfDevType* y) { *x = *x < vmfDevType(0) ? *x : *x * *y; }
+    inline void leakyReLU(vmfDevType* x) { *x = *x < vmfDevType(0) ? *x : *x * 0.01; }
 
     template <typename vmfDevType>
-    inline void leakyReLU(vmfDevType* x, vmfDevType y) { *x = *x > vmfDevType(0) ? *x : *x * y; }
+    inline vmfDevType leakyReLU(vmfDevType x) { return x < vmfDevType(0) ? x : x * 0.01; }
 
     template <typename vmfDevType>
-    inline vmfDevType leakyReLU(vmfDevType x, vmfDevType y) { return x < vmfDevType(0) ? x : x * y; }
+    inline void leakyReLUDerivative(vmfDevType* x) { *x = *x < vmfDevType(0) ? *x * 100 : *x; }
 
     template <typename vmfDevType>
-    inline void leakyReLUDerivative(vmfDevType* x, vmfDevType* y) { *x = *x < vmfDevType(0) ? *x / *y : *x; }
-
-    template <typename vmfDevType>
-    inline void leakyReLUDerivative(vmfDevType* x, vmfDevType y) { *x = *x > vmfDevType(0) ? *x : *x / y; }
-
-    template <typename vmfDevType>
-    inline vmfDevType leakyReLUDerivative(vmfDevType x, vmfDevType y) { return x < vmfDevType(0) ? x / y : x; }
+    inline vmfDevType leakyReLUDerivative(vmfDevType x) { return x < vmfDevType(0) ? x * 100 : x; }
 
     // Sigmoid
     template <typename vmfDevType>
@@ -44,18 +38,10 @@ namespace VMF
     inline vmfDevType sigmoid(vmfDevType x) { return 1 / (1 + std::exp(-x)); }
 
     template <typename vmfDevType>
-    inline void sigmoidDerivative(vmfDevType* x)
-    {
-        const vmfDevType sigmoidValue = 1 / (1 + std::exp(-*x));
-        *x = sigmoidValue * (1 - sigmoidValue);
-    }
+    inline void sigmoidDerivative(vmfDevType* x) { *x = *x * (vmdDevType(1.0) - *x) }
 
     template <typename vmfDevType>
-    inline vmfDevType sigmoidDerivative(vmfDevType x)
-    {
-        const double sigmoidValue = 1 / (1 + std::exp(-x));
-        return sigmoidValue * (1 - sigmoidValue);
-    }
+    inline vmfDevType sigmoidDerivative(vmfDevType x) { return x * (vmfDevType(1.0) - x); }
 
     // Heaviside step function
     template <typename vmfDevType>
@@ -79,27 +65,40 @@ namespace VMF
 
     // Convolute 1D
     template <typename vmfDevType>
-    inline void convolute1D(const vmfDevType* input, const vmfDevType* kernel, vmfDevType* output, std::uint64_t inputSize, std::uint64_t kernelSize)
+    inline void convolute1D(AOS<vmfDevType> input, AOS<vmfDevType> kernel, AOS<vmfDevType> output)
     {
-        std::uint64_t outputSize = inputSize - kernelSize + 1;
+        std::uint64_t outputSize = input.size() - kernel.size() + 1;
         for (std::uint64_t i = 0; i < outputSize; ++i)
         {
             output[i] = vmfDevType(0);
-            for (std::uint64_t j = 0; j < kernelSize; ++j) output[i] += input[i + j] * kernel[j];
+            for (std::uint64_t j = 0; j < kernel.size(); ++j) output[i] += input[i + j] * kernel[j];
         }
     }
 
     template <typename vmfDevType>
-    inline vmfDevType* convolute1D(const vmfDevType* input, const vmfDevType* kernel, std::uint64_t inputSize, std::uint64_t kernelSize)
+    inline AOS<vmfDevType> convolute1D(AOS<vmfDevType> input, AOS<vmfDevType> kernel)
     {
         constexpr std::uint64_t vmfSize = (std::uint64_t)sizeof(vmfDevType);
-        std::uint64_t outputSize = inputSize - kernelSize + 1;
-        vmfDevType* output = (vmfDevType*)malloc(vmfSize * outputSize);
+        std::uint64_t outputSize = input.size() - kernel.size() + 1;
+        AOS<vmfDevType> output(outputSize, vmfDevType(0));
         for (std::uint64_t i = 0; i < outputSize; ++i)
-        {
-            output[i] = vmfDevType(0);
-            for (std::uint64_t j = 0; j < kernelSize; ++j) output[i] += input[i + j] * kernel[j];
-        }
+            for (std::uint64_t j = 0; j < kernel.size(); ++j) output[i] += input[i + j] * kernel[j];
         return output;
+    }
+
+    // Dotproduct
+    template <typename vmfDevType>
+    inline void dotProduct(AOS<vmfDevType> vars, vmfDevType& var, vmfDevType* result)
+    {
+        *result = vmfDevType(0);
+        for (std::uint64_t i = 0; i < vars.size(); ++i) *result += vars[i] * var;
+    }
+
+    template <typename vmfDevType>
+    inline vmfDevType dotProduct(AOS<vmfDevType> vars, vmfDevType& var)
+    {
+        vmfDevType result = vmfDevType(0);
+        for (std::uint64_t i = 0; i < vars.size(); ++i) *result += vars[i] * var;
+        return result;
     }
 }
