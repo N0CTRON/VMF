@@ -85,12 +85,13 @@ namespace VMF_CUDA
         __syncthreads();
     }
 
+    // Dotprod
     template <typename vmfDevType>
-    __global__ void dotProduct(vmfDevType* vars, vmfDevType var, vmfDevType* result, cuSize arraySize)
+    __global__ void dotProduct(vmfDevType* vars1, vmfDevType* vars2, vmfDevType* result, cuSize arraySize)
     {
         cuSize threadIndexX = blockIdx.x * blockDim.x + threadIdx.x;
         vmfDevType sum = 0;
-        for (cuSize i = threadIndexX; i < arraySize; i += blockDim.x * gridDim.x) sum += vars[i] * var;
+        for (cuSize i = threadIndexX; i < arraySize; i += blockDim.x * gridDim.x) sum += vars1[i] * vars2[i];
         atomicAdd(result, sum);
     }
 }
