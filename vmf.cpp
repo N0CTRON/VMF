@@ -98,7 +98,7 @@ namespace VMF
     inline vmfDevType dotProduct(AOS<vmfDevType> vars, vmfDevType& var)
     {
         vmfDevType result = vmfDevType(0);
-        for (std::uint64_t i = 0; i < vars.size(); ++i) *result += vars[i] * var;
+        for (std::uint64_t i = 0; i < vars.size(); ++i) result += vars[i] * var;
         return result;
     }
 }
