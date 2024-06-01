@@ -88,17 +88,19 @@ namespace VMF
 
     // Dotproduct
     template <typename vmfDevType>
-    inline void dotProduct(AOS<vmfDevType> vars, vmfDevType& var, vmfDevType* result)
+    inline void dotProduct(vmfDevType* vec1, vmfDevType* vec2, vmfDevType* result, std::uint64_t arraySize)
     {
-        *result = vmfDevType(0);
-        for (std::uint64_t i = 0; i < vars.size(); ++i) *result += vars[i] * var;
+        vmfDevType sum = 0;
+        for (std::uint64_t i = 0; i < arraySize; ++i) sum += vec1[i] * vec2[i];
+        *result = sum;
     }
 
+
     template <typename vmfDevType>
-    inline vmfDevType dotProduct(AOS<vmfDevType> vars, vmfDevType& var)
+    inline vmfDevType dotProductHost(const vmfDevType* vec1, const vmfDevType* vec2, std::uint64_t arraySize)
     {
-        vmfDevType result = vmfDevType(0);
-        for (std::uint64_t i = 0; i < vars.size(); ++i) result += vars[i] * var;
-        return result;
+        vmfDevType sum(0);
+        for (std::uint64_t i = 0; i < arraySize; ++i) sum += vec1[i] * vec2[i];
+        return sum;
     }
 }
