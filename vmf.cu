@@ -44,7 +44,7 @@ namespace VMF_CUDA
     __global__ void sigmoid(vmfDevType* x, cuSize arraySize)
     {
         cuSize threadIndexX = blockIdx.x * blockDim.x + threadIdx.x;
-        if (threadIndexX < arraySize) x[threadIndexX] = vmfDevType(0.5) * (vmfDevType(1.0) + tanh(vmfDevType(0.5) * x[threadIndexX]));
+        if (threadIndexX < arraySize) x[threadIndexX] = vmfDevType(1.0) / (vmfDevType(1.0) + exp(-x[threadIndexX]));
         __syncthreads();
     }
 
@@ -54,11 +54,12 @@ namespace VMF_CUDA
         cuSize threadIndexX = blockIdx.x * blockDim.x + threadIdx.x;
         if (threadIndexX < arraySize)
         {
-            const vmfDevType sigmoidValue = 1 / (1 + exp(-x[threadIndexX]));
-            x[threadIndexX] = sigmoidValue * (1 - sigmoidValue);
+            const vmfDevType sigmoidValue = vmfDevType(1.0) / (vmfDevType(1.0) + exp(-x[threadIndexX]));
+            x[threadIndexX] = sigmoidValue * (vmfDevType(1.0) - sigmoidValue);
         }
         __syncthreads();
     }
+
 
     // Heaviside step function
     template <typename vmfDevType>
@@ -85,13 +86,12 @@ namespace VMF_CUDA
         __syncthreads();
     }
 
-    // Dotprod
     template <typename vmfDevType>
-    __global__ void dotProduct(vmfDevType* vars1, vmfDevType* vars2, vmfDevType* result, cuSize arraySize)
+    __global__ void dotProduct(vmfDevType* vars, vmfDevType var, vmfDevType* result, cuSize arraySize)
     {
         cuSize threadIndexX = blockIdx.x * blockDim.x + threadIdx.x;
         vmfDevType sum = 0;
-        for (cuSize i = threadIndexX; i < arraySize; i += blockDim.x * gridDim.x) sum += vars1[i] * vars2[i];
+        for (cuSize i = threadIndexX; i < arraySize; i += blockDim.x * gridDim.x) sum += vars[i] * var;
         atomicAdd(result, sum);
     }
 }
