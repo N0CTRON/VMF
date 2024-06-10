@@ -38,7 +38,7 @@ namespace VMF
     inline vmfDevType sigmoid(vmfDevType x) { return 1 / (1 + std::exp(-x)); }
 
     template <typename vmfDevType>
-    inline void sigmoidDerivative(vmfDevType* x) { *x = *x * (vmdDevType(1.0) - *x) }
+    inline void sigmoidDerivative(vmfDevType* x) { *x = *x * (vmdDevType(1.0) - *x); }
 
     template <typename vmfDevType>
     inline vmfDevType sigmoidDerivative(vmfDevType x) { return x * (vmfDevType(1.0) - x); }
