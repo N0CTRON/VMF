@@ -88,17 +88,17 @@ namespace VMF
 
     // Dotproduct
     template <typename vmfDevType>
-    inline void dotProduct(AOS<vmfDevType> vars, vmfDevType& var, vmfDevType* result)
+    inline void dotProduct(AOS<vmfDevType> vars, AOS<vmfDevType> vars2, vmfDevType* result)
     {
         *result = vmfDevType(0);
-        for (std::uint64_t i = 0; i < vars.size(); ++i) *result += vars[i] * var;
+        for (std::uint64_t i = 0; i < vars.size(); ++i) *result += vars[i] * vars2[i];
     }
 
     template <typename vmfDevType>
-    inline vmfDevType dotProduct(AOS<vmfDevType> vars, vmfDevType& var)
+    inline vmfDevType dotProduct(AOS<vmfDevType> vars, AOS<vmfDevType> vars2)
     {
         vmfDevType result = vmfDevType(0);
-        for (std::uint64_t i = 0; i < vars.size(); ++i) *result += vars[i] * var;
+        for (std::uint64_t i = 0; i < vars.size(); ++i) result += vars[i] * vars2[i];
         return result;
     }
 }
