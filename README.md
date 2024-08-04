@@ -14,7 +14,7 @@ Here is an example of how to use the VMF library:
 ```cpp
 #include <iostream>
 
-#include "vmf.cpp"
+#include "vmf.hpp"
 #include "aos.hpp"
 
 int main() {
@@ -46,7 +46,7 @@ To build and run the VMF library, follow these steps:
 
 1. Clone the repository: `git clone https://github.com/N0CTRON/VMF`
 2. Navigate to the repository directory: `cd VMF`
-3. Compile the code: `nvcc -o main main.cpp vmf.cpp aos.hpp cuMM.cu`
+3. Compile the code: `nvcc -o main main.cpp vmf.hpp aos.hpp cuMM.cu`
 4. Run the program: `chmod +x ./main && ./main`
 
 **Note**
