@@ -15,7 +15,7 @@ namespace VMF
     inline vmfDevType ReLU(vmfDevType x) { return std::max(x, vmfDevType(0)); }
 
     template <typename vmfDevType>
-    inline void ReLUDerivative(vmfDevType*) { *x = *x > vmfDevType(0) ? x : vmfDevType(0.0); }
+    inline void ReLUDerivative(vmfDevType* x) { *x = *x > vmfDevType(0) ? x : vmfDevType(0.0); }
 
     template <typename vmfDevType>
     inline vmfDevType ReLUDerivative(vmfDevType x) { return x > vmfDevType(0) ? x : vmfDevType(0.0); }
@@ -41,7 +41,7 @@ namespace VMF
     vmfDevType sigmoid(vmfDevType x) { return 1 / (1 + std::exp(-x)); }
 
     template <typename vmfDevType>
-    void sigmoidDerivative(vmfDevType* x) { *x = *x * (vmdDevType(1.0) - *x); }
+    void sigmoidDerivative(vmfDevType* x) { *x = *x * (vmfDevType(1.0) - *x); }
 
     template <typename vmfDevType>
     vmfDevType sigmoidDerivative(vmfDevType x) { return x * (vmfDevType(1.0) - x); }
